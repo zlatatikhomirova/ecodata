@@ -26,10 +26,14 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .address_rel_models import Address
+    from .user_research_assoc_rel_models import UserResearchAssociation
 
 class Status(BaseSqlModel):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String, unique=True)
+
+    # rel
+    researches: Mapped[list["Research"]] = relationship(back_populates="status")
 
 
 class Research(BaseSqlModel):
@@ -41,3 +45,7 @@ class Research(BaseSqlModel):
     description: Mapped[str] = mapped_column(String)
     dates: ...
     status_id: Mapped[int] = mapped_column(Integer, ForeignKey(Status.id))
+
+    # rel
+    user_research_associations: Mapped[list["UserResearchAssociation"]] = relationship(back_populates="research")
+    status: Mapped["Status"] = relationship(back_populates="researches")

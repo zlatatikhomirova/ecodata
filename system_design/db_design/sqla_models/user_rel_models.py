@@ -26,6 +26,8 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .address_rel_models import Address
+    from .job_rel_models import Job
+    from .user_research_assoc_rel_models import UserResearchAssociation
 
 class User(BaseSqlModel):
     id: Mapped[PyUUID] = mapped_column(
@@ -42,3 +44,7 @@ class User(BaseSqlModel):
     birthday: Mapped[date] = mapped_column(Date)
     username: Mapped[str] = mapped_column(String, unique=True)
     password_hash: Mapped[str] = mapped_column(String)
+
+    # rel
+    job: Mapped["Job"] = relationship(back_populates="users")
+    user_research_associations: Mapped[list["UserResearchAssociation"]] = relationship(back_populates="user")

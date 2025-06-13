@@ -26,6 +26,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .address_rel_models import Address
+    from .job_rel_models import Job
 
 class OrganizationDetails(BaseSqlModel):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -33,10 +34,8 @@ class OrganizationDetails(BaseSqlModel):
     email: Mapped[str] = mapped_column(String)
     phone: Mapped[str] = mapped_column(String)
 
-    # relationships
-    job_titles: Mapped[list["Organization"]] = relationship(
-        back_populates="organization_details",
-    )
+    # rel
+    organizations: Mapped[list["Organization"]] = mapped_column(back_populates="organization_details")
 
 
 class Organization(BaseSqlModel):
@@ -49,4 +48,8 @@ class Organization(BaseSqlModel):
     organization_details_id: Mapped[int] = mapped_column(
         Integer, ForeignKey(OrganizationDetails.id), primary_key=True
     )
+
+    # rel
+    organization_details: Mapped["OrganizationDetails"] = mapped_column(back_populates="organizations")
+    jobs: Mapped[list["Job"]] = relationship(back_populates="organization")
 
