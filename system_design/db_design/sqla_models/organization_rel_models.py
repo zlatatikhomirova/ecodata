@@ -27,6 +27,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .address_rel_models import Address
     from .job_rel_models import Job
+    from .biochem_analysis_rel_models import BiochemAnalysis
 
 class OrganizationDetails(BaseSqlModel):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -36,6 +37,13 @@ class OrganizationDetails(BaseSqlModel):
 
     # rel
     organizations: Mapped[list["Organization"]] = mapped_column(back_populates="organization_details")
+
+class OrganizationType(BaseSqlModel):
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String)
+
+    # rel
+    organizations: Mapped[list["Organization"]] = relationship(back_populates="organization_type")
 
 
 class Organization(BaseSqlModel):
@@ -49,7 +57,12 @@ class Organization(BaseSqlModel):
         Integer, ForeignKey(OrganizationDetails.id), primary_key=True
     )
 
+    organization_type: Mapped[int] = mapped_column(
+        Integer, ForeignKey(OrganizationType.id), primary_key=True
+    )
     # rel
     organization_details: Mapped["OrganizationDetails"] = mapped_column(back_populates="organizations")
     jobs: Mapped[list["Job"]] = relationship(back_populates="organization")
-
+    # one2m
+    biochem_analysis_list: Mapped[list["BiochemAnalysis"]] = relationship(back_populates="organization")
+    organization_type: Mapped["OrganizationType"] = relationship(back_populates="organizations")

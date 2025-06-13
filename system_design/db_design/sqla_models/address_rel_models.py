@@ -22,6 +22,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .pollutions_rel_models import PollutionsNearPlace
+    from .plant_rel_models import Plant
 
 class HouseNumber(BaseSqlModel):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -136,3 +137,6 @@ class Address(BaseSqlModel):
                                                                                         )
     house_number: Mapped["HouseNumber"] = relationship("HouseNumber", back_populates="addresses")
     pollutions_near_place: Mapped[list["PollutionsNearPlace"]] = relationship("PollutionsNearPlace", back_populates="address")
+
+    plants: Mapped[list["Plant"]] = relationship(back_populates="address")
+

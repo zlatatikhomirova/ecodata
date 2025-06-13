@@ -26,27 +26,37 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .address_rel_models import Address
+    from .research_plant_assoc_rel_models import ResearchPlantAssociation
 
 
 class LeafType(BaseSqlModel):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String, unique=True)
 
+    # rel
+    plants_descriptions: Mapped[list["PlantDescription"]] = relationship(back_populates="leaf_type")
+
 
 class Genus(BaseSqlModel):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String, unique=True)
 
+    # rel
+    plants_descriptions: Mapped[list["PlantDescription"]] = relationship(back_populates="genus")
 
 class Species(BaseSqlModel):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String, unique=True)
 
+    # rel
+    plants_descriptions: Mapped[list["PlantDescription"]] = relationship(back_populates="species")
 
 class LifeForm(BaseSqlModel):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String, unique=True)
 
+    # rel
+    plants_descriptions: Mapped[list["PlantDescription"]] = relationship(back_populates="life_form")
 
 class PlantDescription(BaseSqlModel):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -54,6 +64,16 @@ class PlantDescription(BaseSqlModel):
     leaf_type_id: Mapped[int] = mapped_column(Integer, ForeignKey(LeafType.id))
     genus_id: Mapped[int] = mapped_column(Integer, ForeignKey(Genus.id))
     species_id: Mapped[int] = mapped_column(Integer, ForeignKey(Species.id))
+
+    # rel
+    # m2one
+    leaf_type: Mapped["LeafType"] = relationship(back_populates="plants_descriptions")
+    genus: Mapped["Genus"] = relationship(back_populates="plants_descriptions")
+    species: Mapped["Species"] = relationship(back_populates="plants_descriptions")
+    life_form: Mapped["LifeForm"] = relationship(back_populates="plants_descriptions")
+
+    # one2m
+    plants: Mapped[list["Plant"]] = relationship(back_populates="plant_description")
 
 class Plant(BaseSqlModel):
     id: Mapped[PyUUID] = mapped_column(
@@ -65,3 +85,13 @@ class Plant(BaseSqlModel):
     plant_description_id: Mapped[int] = mapped_column(
         Integer, ForeignKey(PlantDescription.id)
     )
+
+    # rel
+    # m2one
+    plant_description: Mapped["PlantDescription"] = relationship(back_populates="plants")
+    address: Mapped["Address"] = relationship(back_populates="plants")
+
+    # one2m
+    research_plant_associations: Mapped[list["ResearchPlantAssociation"]] = relationship(back_populates="plant")
+
+   
