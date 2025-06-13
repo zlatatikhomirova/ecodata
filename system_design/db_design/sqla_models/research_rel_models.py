@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from typing import TYPE_CHECKING
 
 from uuid import UUID as PyUUID, uuid4
 
@@ -6,25 +6,15 @@ from sqlalchemy.dialects.postgresql import UUID, DATERANGE
 from psycopg2.extras import DateRange
 
 from sqlalchemy import (
-    Column,
-    DateTime,
     ForeignKey,
-    MetaData,
-    Numeric,
     String,
-    Table,
-    Date,
     Integer,
-    types,
     func,
 )
 
-from sqlalchemy.orm import declared_attr, Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from .base import BaseSqlModel, NameCategory, created_at_utc
-
-
-from typing import TYPE_CHECKING
+from .base import BaseSqlModel
 
 if TYPE_CHECKING:
     from .address_rel_models import Address
@@ -36,6 +26,7 @@ class Status(BaseSqlModel):
     name: Mapped[str] = mapped_column(String, unique=True)
 
     # rel
+    # one2m
     researches: Mapped[list["Research"]] = relationship(back_populates="status")
 
 
@@ -50,6 +41,9 @@ class Research(BaseSqlModel):
     status_id: Mapped[int] = mapped_column(Integer, ForeignKey(Status.id))
 
     # rel
-    user_research_associations: Mapped[list["UserResearchAssociation"]] = relationship(back_populates="research")
+    # m2one
     status: Mapped["Status"] = relationship(back_populates="researches")
+
+    # one2m
+    user_research_associations: Mapped[list["UserResearchAssociation"]] = relationship(back_populates="research")
     research_plant_associations: Mapped[list["ResearchPlantAssociation"]] = relationship(back_populates="research")
