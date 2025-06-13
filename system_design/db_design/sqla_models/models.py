@@ -147,16 +147,6 @@ class PlantDescription(BaseSqlModel):
     genus_id: Mapped[int] = mapped_column(Integer, ForeignKey(Genus.id))
     species_id: Mapped[int] = mapped_column(Integer, ForeignKey(Species.id))
 
-
-class Pollution(BaseSqlModel):
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    name: Mapped[str] = mapped_column(String, unique=True)
-
-
-class PollutionsNearPlace(BaseSqlModel):
-    address_id: Mapped[int] = mapped_column(Integer, ForeignKey(Address.id))
-    pollution_id: Mapped[int] = mapped_column(Integer, ForeignKey(Pollution.id))
-
 class Plant(BaseSqlModel):
     id: Mapped[PyUUID] = mapped_column(
         UUID, primary_key=True, default=uuid4, server_default=func.gen_random_uuid()
