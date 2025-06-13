@@ -135,4 +135,4 @@ class Address(BaseSqlModel):
                                                                                         back_populates="addresses",
                                                                                         )
     house_number: Mapped["HouseNumber"] = relationship("HouseNumber", back_populates="addresses")
-    pollutions_near_place: Mapped[list["PollutonsNearPlace"]]
+    pollutions_near_place: Mapped[list["PollutionsNearPlace"]] = relationship("PollutionsNearPlace", back_populates="address")
