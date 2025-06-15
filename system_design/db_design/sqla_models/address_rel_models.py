@@ -1,24 +1,20 @@
-from datetime import datetime, date
-import re
-from uuid import uuid4
+from typing import TYPE_CHECKING
+
+from uuid import UUID as PyUUID, uuid4
+
+from sqlalchemy.dialects.postgresql import UUID
+
 
 from sqlalchemy import (
-    UUID,
-    Column,
-    DateTime,
     ForeignKey,
-    MetaData,
-    Numeric,
     String,
-    Table,
-    Date,
     Integer,
+    func,
 )
-from sqlalchemy.orm import declared_attr, Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
 from .base import BaseSqlModel
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .pollutions_rel_models import PollutionsNearPlace
@@ -30,7 +26,8 @@ class HouseNumber(BaseSqlModel):
     number: Mapped[str] = mapped_column(String, nullable=False)
 
     # rel
-    addresses: Mapped[list["Address"]] = relationship("Address", back_populates="house_number")
+    # one2m
+    addresses: Mapped[list["Address"]] = relationship(back_populates="house_number")
 
 
 class Street(BaseSqlModel):
@@ -38,22 +35,19 @@ class Street(BaseSqlModel):
     name: Mapped[str] = mapped_column(String, nullable=False)
 
     # rel
-    street_settlement_association: Mapped[list["StreetSettlementAssociation"]] = relationship("StreetSettlementAssociation",
-                                                                                        back_populates="street")
+    # one2m
+    street_settlement_associations: Mapped[list["StreetSettlementAssociation"]] = relationship(back_populates="street")
 
 
 class Country(BaseSqlModel):
-    __tablename__ = 'countries'
-
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
 
-    # Отношение один-ко-многим: страна → регионы
-    regions: Mapped[list["Region"]] = relationship("Region", back_populates="country")
+    # rel
+    # one2m
+    regions: Mapped[list["Region"]] = relationship(back_populates="country")
 
 class Region(BaseSqlModel):
-    __tablename__ = 'regions'
-
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
 
@@ -61,39 +55,39 @@ class Region(BaseSqlModel):
         Integer, ForeignKey("countries.id"), nullable=False
     )
 
-    # Отношение к Country
-    country: Mapped["Country"] = relationship("Country", back_populates="regions")
-    # Отношение: один Region -> много District
-    districts: Mapped[list["District"]] = relationship("District", back_populates="region")
+    # rel
+    # m2one
+    country: Mapped["Country"] = relationship(back_populates="regions")
+    
+    # one2m
+    districts: Mapped[list["District"]] = relationship(back_populates="region")
 
 
 class District(BaseSqlModel):
-    __tablename__ = 'districts'
-
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
 
     region_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("regions.id"), nullable=False
+        Integer, ForeignKey(Region.id), nullable=False
     )
 
-    # Обратная связь к Region
-    region: Mapped["Region"] = relationship("Region", back_populates="districts")
-    settlements: Mapped[list["Settlement"]] = relationship("Settlement", back_populates="district")
+    # rel
+    # m2one
+    region: Mapped["Region"] = relationship(back_populates="districts")
+    
+    # one2m
+    settlements: Mapped[list["Settlement"]] = relationship(back_populates="district")
 
 
 class SettlementType(BaseSqlModel):
-    __tablename__ = 'settlement_types'
-
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
 
-    # Отношение один-ко-многим: тип → имена
-    settlements: Mapped[list["Settlement"]] = relationship("Settlement", back_populates="settlement_type")
+    # rel
+    # one2m
+    settlements: Mapped[list["Settlement"]] = relationship(back_populates="settlement_type")
 
 class Settlement(BaseSqlModel):
-    __tablename__ = 'settlement_names'
-
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
 
@@ -104,11 +98,13 @@ class Settlement(BaseSqlModel):
         Integer, ForeignKey(SettlementType.id), nullable=False
     )
 
-    # Обратная связь к SettlementType
-    settlement_type: Mapped["SettlementType"] = relationship("SettlementType", back_populates="settlements")
-    district: Mapped["District"] = relationship("District", back_populates="settlements")
-    street_settlement_association: Mapped[list["StreetSettlementAssociation"]] = relationship("StreetSettlementAssociation",
-                                                                                        back_populates="settlement")
+    # rel
+    # m2one
+    settlement_type: Mapped["SettlementType"] = relationship(back_populates="settlements")
+    district: Mapped["District"] = relationship(back_populates="settlements")
+    
+    # one2m
+    street_settlement_associations: Mapped[list["StreetSettlementAssociation"]] = relationship(back_populates="settlement")
 
 
 class StreetSettlementAssociation(BaseSqlModel):
@@ -116,15 +112,22 @@ class StreetSettlementAssociation(BaseSqlModel):
     street_id: Mapped[int] = mapped_column(
         Integer, ForeignKey(Street.id), primary_key=True
     )
-    settlement_name_id: Mapped[int] = mapped_column(
+    settlement_id: Mapped[int] = mapped_column(
         Integer, ForeignKey(Settlement.id), primary_key=True
     )
 
-    street: Mapped["Street"] = relationship("Street", back_populates="street_settlement_association")
-    settlement: Mapped["Settlement"] = relationship("Settlement", back_populates="street_settlement_association")
-    addresses: Mapped[list["Address"]] = relationship("Address", back_populates="street_settlement_association")
+    # rel
+    # m2one
+    street: Mapped["Street"] = relationship(back_populates="street_settlement_associations")
+    settlement: Mapped["Settlement"] = relationship(back_populates="street_settlement_associations")
+    
+    # one2m
+    addresses: Mapped[list["Address"]] = relationship(back_populates="street_settlement_association")
 
 class Address(BaseSqlModel):
+    id: Mapped[PyUUID] = mapped_column(
+        UUID, primary_key=True, default=uuid4, server_default=func.gen_random_uuid()
+    )
     house_number_id: Mapped[int] = mapped_column(
         Integer, ForeignKey(HouseNumber.id), primary_key=True
     )
@@ -133,12 +136,11 @@ class Address(BaseSqlModel):
     )
 
     # rel
-    street_settlement_association: Mapped["StreetSettlementAssociation"] = relationship("StreetSettlementAssociation",
-                                                                                        back_populates="addresses",
-                                                                                        )
-    house_number: Mapped["HouseNumber"] = relationship("HouseNumber", back_populates="addresses")
+    # m2one
+    street_settlement_association: Mapped["StreetSettlementAssociation"] = relationship(back_populates="addresses")
+    house_number: Mapped["HouseNumber"] = relationship(back_populates="addresses")
+    
+    # one2m
     pollutions_near_place_list: Mapped[list["PollutionsNearPlace"]] = relationship(back_populates="address")
-
     plants: Mapped[list["Plant"]] = relationship(back_populates="address")
-
     organizations: Mapped[list["Organization"]] = relationship(back_populates="address")
