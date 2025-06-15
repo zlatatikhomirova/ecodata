@@ -48,4 +48,6 @@ class Job(BaseSqlModel):
     # rel
     organization: Mapped["Organization"] = relationship(back_populates="jobs")
     job_title: Mapped["JobTitle"] = relationship(back_populates="jobs")
+    
+    # one2m
     users: Mapped[list["User"]] = relationship(back_populates="job")

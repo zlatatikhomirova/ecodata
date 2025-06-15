@@ -1,28 +1,17 @@
-from datetime import datetime, date
-
+from typing import TYPE_CHECKING
 from uuid import UUID as PyUUID, uuid4
 
 from sqlalchemy.dialects.postgresql import UUID
 
 from sqlalchemy import (
-    Column,
-    DateTime,
     ForeignKey,
-    MetaData,
-    Numeric,
     String,
-    Table,
-    Date,
     Integer,
-    types,
     func,
 )
-from sqlalchemy.orm import declared_attr, Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from .base import BaseSqlModel, NameCategory, created_at_utc
-
-
-from typing import TYPE_CHECKING
+from .base import BaseSqlModel
 
 if TYPE_CHECKING:
     from .address_rel_models import Address
@@ -34,6 +23,7 @@ class LeafType(BaseSqlModel):
     name: Mapped[str] = mapped_column(String, unique=True)
 
     # rel
+    # one2m
     plants_descriptions: Mapped[list["PlantDescription"]] = relationship(back_populates="leaf_type")
 
 
@@ -42,6 +32,7 @@ class Genus(BaseSqlModel):
     name: Mapped[str] = mapped_column(String, unique=True)
 
     # rel
+    # one2m
     plants_descriptions: Mapped[list["PlantDescription"]] = relationship(back_populates="genus")
 
 class Species(BaseSqlModel):
@@ -49,6 +40,7 @@ class Species(BaseSqlModel):
     name: Mapped[str] = mapped_column(String, unique=True)
 
     # rel
+    # one2m
     plants_descriptions: Mapped[list["PlantDescription"]] = relationship(back_populates="species")
 
 class LifeForm(BaseSqlModel):
@@ -56,6 +48,7 @@ class LifeForm(BaseSqlModel):
     name: Mapped[str] = mapped_column(String, unique=True)
 
     # rel
+    # one2m
     plants_descriptions: Mapped[list["PlantDescription"]] = relationship(back_populates="life_form")
 
 class PlantDescription(BaseSqlModel):

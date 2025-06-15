@@ -1,5 +1,5 @@
 from typing import TYPE_CHECKING
-from datetime import datetime, date
+from datetime import date
 
 from uuid import UUID as PyUUID, uuid4
 from sqlalchemy.dialects.postgresql import UUID
