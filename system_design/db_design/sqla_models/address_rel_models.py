@@ -10,6 +10,7 @@ from sqlalchemy import (
     String,
     Integer,
     func,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -88,6 +89,10 @@ class SettlementType(BaseSqlModel):
     settlements: Mapped[list["Settlement"]] = relationship(back_populates="settlement_type")
 
 class Settlement(BaseSqlModel):
+    __table_args__ = (
+        UniqueConstraint("name", "district_id", "settlement_type_id"),
+    )
+
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
 

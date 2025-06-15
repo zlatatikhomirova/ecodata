@@ -19,13 +19,13 @@ if TYPE_CHECKING:
     from .biochem_analysis_rel_models import BiochemAnalysis
 
 class ResearchPlantAssociation(BaseSqlModel):
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
     research_id: Mapped[PyUUID] = mapped_column(
         UUID, ForeignKey(Research.id), primary_key=True
     )
     plant_id: Mapped[PyUUID] = mapped_column(
         UUID, ForeignKey(Plant.id), primary_key=True
     )
+    
     s3_key_final_morphological_result: Mapped[str] = mapped_column(String, unique=True)
 
     # rel

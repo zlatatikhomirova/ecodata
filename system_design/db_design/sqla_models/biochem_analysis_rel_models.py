@@ -5,6 +5,8 @@ from sqlalchemy import (
     String,
     Date,
     Integer,
+    ForeignKeyConstraint,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -16,10 +18,22 @@ if TYPE_CHECKING:
     from .measurement_rel_models import MeasurementUnit
 
 class BiochemAnalysis(BaseSqlModel):
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ['par_research_id', 'par_plant_id'],
+            ['ResearchPlantAssociation.research_id', 'ResearchPlantAssociation.plant_id']
+        ),
+    )
+
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     date: Mapped[date] = mapped_column(Date) # type: ignore
     additional_info: Mapped[str] = mapped_column(String)
-    research_plant_association_id: Mapped[int] = mapped_column(Integer, ForeignKey(ResearchPlantAssociation.id))
+
+    # parent keys
+    # research_plant_association_id
+    par_research_id: Mapped[int] = mapped_column(Integer)
+    par_plant_id: Mapped[int] = mapped_column(Integer)
+
     organization_id: Mapped[int] = mapped_column(Integer, ForeignKey(Organization.id))
     s3_key: Mapped[str] = mapped_column(String, unique=True)
 
