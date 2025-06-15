@@ -23,10 +23,13 @@ class PollutionType(BaseSqlModel):
         "PollutionsNearPlace", back_populates="pollution_type"
     )
 
-
 class PollutionsNearPlace(BaseSqlModel):
-    address_id: Mapped[int] = mapped_column(Integer, ForeignKey(Address.id))
-    pollution_type_id: Mapped[int] = mapped_column(Integer, ForeignKey(PollutionType.id))
+    address_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey(Address.id), primary_key=True
+    )
+    pollution_type_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey(PollutionType.id), primary_key=True
+    )
 
     # rel
     # m2one
