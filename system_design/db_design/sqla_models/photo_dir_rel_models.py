@@ -1,28 +1,13 @@
-from datetime import datetime, date
-
-from uuid import UUID as PyUUID, uuid4
-
-from sqlalchemy.dialects.postgresql import UUID
+from typing import TYPE_CHECKING
 
 from sqlalchemy import (
-    Column,
-    DateTime,
     ForeignKey,
-    MetaData,
-    Numeric,
     String,
-    Table,
-    Date,
     Integer,
-    types,
-    func,
 )
-from sqlalchemy.orm import declared_attr, Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from .base import BaseSqlModel, NameCategory, created_at_utc
-from .address_rel_models import Address
-
-from typing import TYPE_CHECKING
+from .base import BaseSqlModel
 
 if TYPE_CHECKING:
     from .research_plant_assoc_rel_models import ResearchPlantAssociation
