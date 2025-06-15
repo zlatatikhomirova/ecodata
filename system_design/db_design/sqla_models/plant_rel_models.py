@@ -57,6 +57,7 @@ class PlantDescription(BaseSqlModel):
     leaf_type_id: Mapped[int] = mapped_column(Integer, ForeignKey(LeafType.id))
     genus_id: Mapped[int] = mapped_column(Integer, ForeignKey(Genus.id))
     species_id: Mapped[int] = mapped_column(Integer, ForeignKey(Species.id))
+    description: Mapped[str] = mapped_column(String)
 
     # rel
     # m2one
@@ -72,8 +73,8 @@ class Plant(BaseSqlModel):
     id: Mapped[PyUUID] = mapped_column(
         UUID, primary_key=True, default=uuid4, server_default=func.gen_random_uuid()
     )
-    address_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey(Address.id)
+    address_id: Mapped[PyUUID] = mapped_column(
+        UUID, ForeignKey(Address.id)
     )
     plant_description_id: Mapped[int] = mapped_column(
         Integer, ForeignKey(PlantDescription.id)

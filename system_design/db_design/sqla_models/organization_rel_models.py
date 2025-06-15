@@ -8,6 +8,7 @@ from sqlalchemy import (
     String,
     Integer,
     func,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -38,14 +39,20 @@ class OrganizationType(BaseSqlModel):
 
 
 class Organization(BaseSqlModel):
-    address_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey(Address.id), primary_key=True
-    )
-    organization_details_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey(OrganizationDetails.id), primary_key=True
+    __table_args__ = (
+        UniqueConstraint("address_id", "organization_details_id"),
     )
 
-    organization_type: Mapped[int] = mapped_column(
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    address_id: Mapped[PyUUID] = mapped_column(
+        UUID, ForeignKey(Address.id)
+    )
+
+    organization_details_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey(OrganizationDetails.id)
+    )
+
+    organization_type_id: Mapped[int] = mapped_column(
         Integer, ForeignKey(OrganizationType.id)
     )
     # rel

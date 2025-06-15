@@ -113,12 +113,16 @@ class Settlement(BaseSqlModel):
 
 
 class StreetSettlementAssociation(BaseSqlModel):
+    __table_args__ = (
+        UniqueConstraint("street_id", "settlement_id"),
+    )
+
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     street_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey(Street.id), primary_key=True
+        Integer, ForeignKey(Street.id)
     )
     settlement_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey(Settlement.id), primary_key=True
+        Integer, ForeignKey(Settlement.id)
     )
 
     # rel
@@ -130,14 +134,18 @@ class StreetSettlementAssociation(BaseSqlModel):
     addresses: Mapped[list["Address"]] = relationship(back_populates="street_settlement_association")
 
 class Address(BaseSqlModel):
+    __table_args__ = (
+        UniqueConstraint("house_number_id", "street_settlement_association_id"),
+    )
+
     id: Mapped[PyUUID] = mapped_column(
         UUID, primary_key=True, default=uuid4, server_default=func.gen_random_uuid()
     )
     house_number_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey(HouseNumber.id), primary_key=True
+        Integer, ForeignKey(HouseNumber.id)
     )
     street_settlement_association_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey(StreetSettlementAssociation.id), primary_key=True
+        Integer, ForeignKey(StreetSettlementAssociation.id)
     )
 
     # rel

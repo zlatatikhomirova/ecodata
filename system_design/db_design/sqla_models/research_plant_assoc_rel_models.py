@@ -1,12 +1,13 @@
 from typing import TYPE_CHECKING
-from uuid import UUID as PyUUID
+from uuid import UUID as PyUUID, uuid4
 
 from sqlalchemy.dialects.postgresql import UUID
 
 from sqlalchemy import (
     ForeignKey,
     String,
-    Integer,
+    UniqueConstraint,
+    func,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -19,6 +20,13 @@ if TYPE_CHECKING:
     from .biochem_analysis_rel_models import BiochemAnalysis
 
 class ResearchPlantAssociation(BaseSqlModel):
+    __table_args__ = (
+        UniqueConstraint("research_id", "plant_id"),
+    )
+
+    id: Mapped[PyUUID] = mapped_column(
+        UUID, primary_key=True, default=uuid4, server_default=func.gen_random_uuid()
+    )
     research_id: Mapped[PyUUID] = mapped_column(
         UUID, ForeignKey(Research.id), primary_key=True
     )

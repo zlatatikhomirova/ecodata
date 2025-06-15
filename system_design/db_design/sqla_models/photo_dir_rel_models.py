@@ -1,4 +1,7 @@
 from typing import TYPE_CHECKING
+from uuid import UUID as PyUUID, uuid4
+
+from sqlalchemy.dialects.postgresql import UUID
 
 from sqlalchemy import (
     ForeignKey,
@@ -16,19 +19,11 @@ if TYPE_CHECKING:
 
 
 class PhotoDir(BaseSqlModel):
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ['par_research_id', 'par_plant_id'],
-            ['ResearchPlantAssociation.research_id', 'ResearchPlantAssociation.plant_id']
-        ),
-    )
-
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
 
-    # parent keys
-    # research_plant_association_id
-    par_research_id: Mapped[int] = mapped_column(Integer)
-    par_plant_id: Mapped[int] = mapped_column(Integer)
+    research_plant_association_id: Mapped[PyUUID] = mapped_column(
+        UUID, ForeignKey(ResearchPlantAssociation.id)
+    )
 
     name: Mapped[str] = mapped_column(String, unique=True)
     s3_key_joined_result_csv: Mapped[str] = mapped_column(String, unique=True)

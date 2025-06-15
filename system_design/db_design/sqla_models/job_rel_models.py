@@ -4,7 +4,7 @@ from sqlalchemy import (
     ForeignKey,
     String,
     Integer,
-    ForeignKeyConstraint,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -25,19 +25,16 @@ class JobTitle(BaseSqlModel):
 
 class Job(BaseSqlModel):
     __table_args__ = (
-        ForeignKeyConstraint(
-            ['par_address_id', 'par_organization_details_id'],
-           !!! ['parent.research_id', 'parent.plant_id']
-        ),
+        UniqueConstraint("job_title_id", "organization_id"),
     )
 
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
     job_title_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey(JobTitle.id), primary_key=True
+        Integer, ForeignKey(JobTitle.id),
     )
-    # parent 
-    # organization_id
-    par_address_id: ...
-    par_organization_details_id: ...
+    organization_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey(Organization.id),
+    )
 
     # rel
     # m2one

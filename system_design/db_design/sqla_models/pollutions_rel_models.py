@@ -1,4 +1,7 @@
 from typing import TYPE_CHECKING
+from uuid import UUID as PyUUID, uuid4
+
+from sqlalchemy.dialects.postgresql import UUID
 
 from sqlalchemy import (
     ForeignKey,
@@ -24,8 +27,8 @@ class PollutionType(BaseSqlModel):
     )
 
 class PollutionsNearPlace(BaseSqlModel):
-    address_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey(Address.id), primary_key=True
+    address_id: Mapped[PyUUID] = mapped_column(
+        UUID, ForeignKey(Address.id)
     )
     pollution_type_id: Mapped[int] = mapped_column(
         Integer, ForeignKey(PollutionType.id), primary_key=True
