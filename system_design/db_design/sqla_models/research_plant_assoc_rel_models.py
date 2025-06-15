@@ -1,28 +1,16 @@
-from datetime import datetime, date
-
-from uuid import UUID as PyUUID, uuid4
+from typing import TYPE_CHECKING
+from uuid import UUID as PyUUID
 
 from sqlalchemy.dialects.postgresql import UUID
 
 from sqlalchemy import (
-    Column,
-    DateTime,
     ForeignKey,
-    MetaData,
-    Numeric,
     String,
-    Table,
-    Date,
     Integer,
-    types,
-    func,
 )
-from sqlalchemy.orm import declared_attr, Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from .base import BaseSqlModel, NameCategory, created_at_utc
-from .address_rel_models import Address
-
-from typing import TYPE_CHECKING
+from .base import BaseSqlModel
 
 if TYPE_CHECKING:
     from .research_rel_models import Research
@@ -36,7 +24,7 @@ class ResearchPlantAssociation(BaseSqlModel):
         UUID, ForeignKey(Research.id), primary_key=True
     )
     plant_id: Mapped[PyUUID] = mapped_column(
-        UUID, ForeignKey(Research.id), primary_key=True
+        UUID, ForeignKey(Plant.id), primary_key=True
     )
     s3_key_final_morphological_result: Mapped[str] = mapped_column(String, unique=True)
 
