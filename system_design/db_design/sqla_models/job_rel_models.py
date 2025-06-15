@@ -1,28 +1,13 @@
-from datetime import datetime, date
-
-from uuid import UUID as PyUUID, uuid4
-
-from sqlalchemy.dialects.postgresql import UUID
+from typing import TYPE_CHECKING
 
 from sqlalchemy import (
-    Column,
-    DateTime,
     ForeignKey,
-    MetaData,
-    Numeric,
     String,
-    Table,
-    Date,
     Integer,
-    types,
-    func,
 )
-from sqlalchemy.orm import declared_attr, Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from .base import BaseSqlModel, NameCategory, created_at_utc
-
-
-from typing import TYPE_CHECKING
+from .base import BaseSqlModel
 
 if TYPE_CHECKING:
     from .organization_rel_models import Organization
@@ -34,6 +19,7 @@ class JobTitle(BaseSqlModel):
     name: Mapped[str] = mapped_column(String)
 
     # rel
+    # one2m
     jobs: Mapped[list["Job"]] = relationship(back_populates="job_title")
 
 class Job(BaseSqlModel):
@@ -46,6 +32,7 @@ class Job(BaseSqlModel):
     )
 
     # rel
+    # m2one
     organization: Mapped["Organization"] = relationship(back_populates="jobs")
     job_title: Mapped["JobTitle"] = relationship(back_populates="jobs")
     
