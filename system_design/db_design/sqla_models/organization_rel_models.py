@@ -38,9 +38,6 @@ class OrganizationType(BaseSqlModel):
 
 
 class Organization(BaseSqlModel):
-    id: Mapped[PyUUID] = mapped_column(
-        UUID, primary_key=True, default=uuid4, server_default=func.gen_random_uuid()
-    )
     address_id: Mapped[int] = mapped_column(
         Integer, ForeignKey(Address.id), primary_key=True
     )

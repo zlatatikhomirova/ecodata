@@ -78,6 +78,7 @@ class Plant(BaseSqlModel):
     plant_description_id: Mapped[int] = mapped_column(
         Integer, ForeignKey(PlantDescription.id)
     )
+    additional_info: Mapped[str] = mapped_column(String)
 
     # rel
     # m2one

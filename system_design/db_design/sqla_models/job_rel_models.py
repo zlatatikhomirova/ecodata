@@ -4,6 +4,7 @@ from sqlalchemy import (
     ForeignKey,
     String,
     Integer,
+    ForeignKeyConstraint,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -23,13 +24,20 @@ class JobTitle(BaseSqlModel):
     jobs: Mapped[list["Job"]] = relationship(back_populates="job_title")
 
 class Job(BaseSqlModel):
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ['par_address_id', 'par_organization_details_id'],
+           !!! ['parent.research_id', 'parent.plant_id']
+        ),
+    )
+
     job_title_id: Mapped[int] = mapped_column(
         Integer, ForeignKey(JobTitle.id), primary_key=True
     )
-    organization_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey(Organization.id), primary_key=True
-    )
+    # parent 
+    # organization_id
+    par_address_id: ...
+    par_organization_details_id: ...
 
     # rel
     # m2one
